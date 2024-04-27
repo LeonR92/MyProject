@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Country Database</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap");
+            body {
+                font-family: "Montserrat", sans-serif;
+            }
+        </style>
+    </head>
+    <!-- Background colour -->
+    <body class="bg-slate-100">
+        <!-- Navbar -->
+        <nav>
+            <div class="flex flex-row justify-between items-center p-4 bg-white shadow-md h-16">
+                <h1 class="text-2xl font-bold">Where in the world</h1>
+                <a class="px-4 py-2 border border-black text-bold" href="/"> Home</a>
+            </div>
+        </nav>
+        <!-- Filter bars using space between small screen stacked -->
+        <label class="mx-auto mt-8 relative bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border-2  py-2 px-2  gap-2  focus-within:border-gray-300" for="search-bar">
+            <input id="search-bar" placeholder="Please enter a country name" class="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white border-none md:border-none" />
+        </label>
+        <!-- 4 cols grid md> 1 col -->
+        <div class="container mx-auto px-4 my-2">
+            <h1 class="text-xl font-bold my-4">Country List</h1>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="countrycards">
+                {% for country in countries %}
+                <div class="countrycard bg-white shadow-md rounded p-5" data-name="{{ country.name.common | lower }}">
+                    {% if country.flags.svg %}
+                        <img src="{{ country.flags.svg }}" alt="Flag of {{ country.name.common | default('the country', true) }}" class="mb-4 h-1/2">
+                    {% else %}
+                        <p>No flag available</p>
+                    {% endif %}
+                    <h2 class="text-lg font-bold my-2">{{ country.name.common }}</h2>
+                    <p>Population: {{ country.population | string }}</p>
+                    <p>Continent: {{ country.continents[0] }}</p>
+                    <p>Languages:
+                        {% if country.languages %}
+                            {% for code, lang in country.languages.items() %}
+                                {{ lang }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            No languages available
+                        {% endif %}
+                    </p>
+
+                    <!-- Link to Google Maps -->
+                    {% if country.maps and country.maps.googleMaps %}
+                        <p><a class="font-bold"  href="{{ country.maps.googleMaps }}" target="_blank">View on Google Maps</a></p>
+                    {% else %}
+                        <p>No map link available</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    
+<script src="/static/country/searchscript.js"></script>
+</html>

@@ -1,0 +1,1 @@
+document.getElementById("search-bar").addEventListener("input",(function(){const e=this.value.toLowerCase();document.querySelectorAll(".countrycard").forEach((t=>{t.getAttribute("data-name").includes(e)?t.style.display="":t.style.display="none"}))}));
