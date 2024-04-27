@@ -34,18 +34,6 @@ def create_app(test_config=False):
 
     # Initialise Flask and configurations
     app = Flask(__name__, static_folder="./static")
-    
-    # Configure Dashboard app
-    dashboard1(app)
-    @app.before_request
-    def before_request_func():
-        # Check if the requested path is part of the Dash app's path
-        if '/dashboard1/' in request.path:
-            # Check if the user is not authenticated
-            if not current_user.is_authenticated:
-                # Redirect to login page if the user is not authenticated
-                return redirect(url_for('login'))
-
 
     if test_config:
         app.config.from_object(TestConfig)
@@ -53,7 +41,7 @@ def create_app(test_config=False):
         app.config.from_object(ProductionConfig)
 
     app.config["SECRET_KEY"] = "1283123k!jkjasd012klajsdAdasd!!@"
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
     app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=7)
     app.config["REMEMBER_COOKIE_SECURE"] = True
     app.config["REMEMBER_COOKIE_HTTPONLY"] = True
@@ -80,6 +68,11 @@ def create_app(test_config=False):
     login_manager.init_app(app)
     login_manager.login_view = "login"
 
+    # Register Compress and cache to Flask app
+    Compress(app)
+    cache.init_app(app)
+
+
     # Import blueprints
     from countryapp.app import (
         country,
@@ -88,9 +81,17 @@ def create_app(test_config=False):
     # Register blueprints
     app.register_blueprint(country, url_prefix="/country")
 
-    # Register Compress and cache to Flask app
-    Compress(app)
-    cache.init_app(app)
+
+    # Configure Dashboard app
+    dashboard1(app)
+    @app.before_request
+    def before_request_func():
+        # Check if the requested path is part of the Dash app's path
+        if '/dashboard1/' in request.path:
+            # Check if the user is not authenticated
+            if not current_user.is_authenticated:
+                # Redirect to login page if the user is not authenticated
+                return redirect(url_for('login'))
 
     @login_manager.user_loader
     def load_user(user_id):
