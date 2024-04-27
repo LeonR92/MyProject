@@ -25,6 +25,7 @@ from users import db, UserModel
 from config import ProductionConfig, TestConfig
 from datetime import timedelta
 from utils import cache
+from dashboard1.dashboard1 import dashboard1
 
 # Create the Flask application
 
@@ -33,6 +34,18 @@ def create_app(test_config=False):
 
     # Initialise Flask and configurations
     app = Flask(__name__, static_folder="./static")
+    
+    # Configure Dashboard app
+    dashboard1(app)
+    @app.before_request
+    def before_request_func():
+        # Check if the requested path is part of the Dash app's path
+        if '/dashboard1/' in request.path:
+            # Check if the user is not authenticated
+            if not current_user.is_authenticated:
+                # Redirect to login page if the user is not authenticated
+                return redirect(url_for('login'))
+
 
     if test_config:
         app.config.from_object(TestConfig)
