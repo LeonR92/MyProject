@@ -26,6 +26,8 @@ from config import ProductionConfig, TestConfig
 from datetime import timedelta
 from utils import cache
 
+# Create the Flask application
+
 def create_app(test_config=False):
     """Create and configure an instance of the Flask application."""
 
