@@ -88,7 +88,8 @@ def create_app(test_config=False):
     def before_request_func():
         # Check if the requested path is part of the Dash app's path
         if '/dashboard1/' in request.path:
-            # Check if the user is not authenticated
+            # Check if the user is not authenticated and added rate limiter to prevent burst
+            limiter.limit("15 per minute")(lambda: request.path)() 
             if not current_user.is_authenticated:
                 # Redirect to login page if the user is not authenticated
                 return redirect(url_for('login'))
