@@ -30,6 +30,7 @@ from dashboard1.dashboard1 import dashboard1
 
 # Create the Flask application
 
+
 def create_app(test_config=False):
     """Create and configure an instance of the Flask application."""
 
@@ -48,30 +49,27 @@ def create_app(test_config=False):
     app.config["REMEMBER_COOKIE_HTTPONLY"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users_login.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
-    #app.config['SESSION_COOKIE_SECURE'] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
+    # app.config['SESSION_COOKIE_SECURE'] = True
 
     # Initialize Flask-Simple-Captcha
     YOUR_CONFIG = {
-        'SECRET_CAPTCHA_KEY': 'ajhsdkjasd72613asdhj',
-        'CAPTCHA_LENGTH': 6,
-        'CAPTCHA_DIGITS': False,
-        'EXPIRE_SECONDS': 600,
+        "SECRET_CAPTCHA_KEY": "ajhsdkjasd72613asdhj",
+        "CAPTCHA_LENGTH": 6,
+        "CAPTCHA_DIGITS": False,
+        "EXPIRE_SECONDS": 600,
     }
     SIMPLE_CAPTCHA = CAPTCHA(config=YOUR_CONFIG)
     app = SIMPLE_CAPTCHA.init_app(app)
-    
 
     #  Rate Limiter to prevent DoS
     limiter = Limiter(
-        app = app,
+        app=app,
         key_func=get_remote_address,  # This function determines the client's IP address
-        default_limits=["400 per day, 70 per hour"]  # This sets a general rate limit
+        default_limits=["400 per day, 70 per hour"],  # This sets a general rate limit
     )
 
     db.init_app(app)  # Initialize the db with the app context
-
-
     with app.app_context():
         db.create_all()
 
@@ -84,7 +82,6 @@ def create_app(test_config=False):
     Compress(app)
     cache.init_app(app)
 
-
     # Import blueprints
     from countryapp.app import (
         country,
@@ -93,18 +90,20 @@ def create_app(test_config=False):
     # Register blueprints
     app.register_blueprint(country, url_prefix="/country")
 
-
     # Configure Dashboard app
     dashboard1(app)
+
     @app.before_request
     def before_request_func():
-        # Check if the requested path is part of the Dash app's path
-        if '/dashboard1/' in request.path:
+        """
+        Before request to limit request and check for login status
+        """ 
+        if "/dashboard1/" in request.path:
             # Check if the user is not authenticated and added rate limiter to prevent burst
-            limiter.limit("15 per minute")(lambda: request.path)() 
+            limiter.limit("15 per minute")(lambda: request.path)()
             if not current_user.is_authenticated:
                 # Redirect to login page if the user is not authenticated
-                return redirect(url_for('login'))
+                return redirect(url_for("login"))
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -113,20 +112,20 @@ def create_app(test_config=False):
     @app.route("/register", methods=["GET", "POST"])
     def register():
         # Handle GET request to display the registration form with a new CAPTCHA
-        if request.method == 'GET':
+        if request.method == "GET":
             new_captcha_dict = SIMPLE_CAPTCHA.create()
-            return render_template('register.html', captcha=new_captcha_dict)
+            return render_template("register.html", captcha=new_captcha_dict)
 
         # Handle POST request to process the form submission
         if request.method == "POST":
             username = request.form["username"]
             password = request.form["password"]
-            c_hash = request.form.get('captcha-hash')
-            c_text = request.form.get('captcha-text')
+            c_hash = request.form.get("captcha-hash")
+            c_text = request.form.get("captcha-text")
 
             # First, verify the CAPTCHA
             if not SIMPLE_CAPTCHA.verify(c_text, c_hash):
-                flash("Invalid CAPTCHA.", "error")  
+                flash("Invalid CAPTCHA.", "error")
                 return redirect(url_for("register"))
 
             # Check if the username already exists in the database
@@ -136,7 +135,7 @@ def create_app(test_config=False):
 
             # If passed all checks, add the new user to the database
             new_user = UserModel(username=username)
-            new_user.set_password(password)  
+            new_user.set_password(password)
             db.session.add(new_user)
             db.session.commit()
             flash("Registration successful! Please login.", "success")
@@ -147,9 +146,9 @@ def create_app(test_config=False):
     @limiter.limit("20 per day")
     def login():
         if request.method == "POST":
-            if request.form.get('password_confirm'):  # Honey Pot
+            if request.form.get("password_confirm"):  # Honey Pot
                 return "Success"
-            
+
             username = request.form["username"]
             password = request.form["password"]
             remember = request.form.get("remember") == "on"

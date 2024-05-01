@@ -20,5 +20,6 @@ class UserModel(UserMixin, db.Model):
         return bcrypt.checkpw(
             password.encode("utf-8"), self.password_hash.encode("utf-8")
         )
+
     def logout_user():
         pass
