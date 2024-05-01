@@ -11,6 +11,7 @@ from flask import (
 )
 from flask_compress import Compress
 from flask_limiter import Limiter
+from flask_simple_captcha import CAPTCHA
 from flask_limiter.util import get_remote_address
 from flask_login import (
     LoginManager,
@@ -49,6 +50,17 @@ def create_app(test_config=False):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
     #app.config['SESSION_COOKIE_SECURE'] = True
+
+    # Initialize Flask-Simple-Captcha
+    YOUR_CONFIG = {
+        'SECRET_CAPTCHA_KEY': 'ajhsdkjasd72613asdhj',
+        'CAPTCHA_LENGTH': 6,
+        'CAPTCHA_DIGITS': False,
+        'EXPIRE_SECONDS': 600,
+    }
+    SIMPLE_CAPTCHA = CAPTCHA(config=YOUR_CONFIG)
+    app = SIMPLE_CAPTCHA.init_app(app)
+    
 
     #  Rate Limiter to prevent DoS
     limiter = Limiter(
@@ -100,17 +112,34 @@ def create_app(test_config=False):
 
     @app.route("/register", methods=["GET", "POST"])
     def register():
+        # Handle GET request to display the registration form with a new CAPTCHA
+        if request.method == 'GET':
+            new_captcha_dict = SIMPLE_CAPTCHA.create()
+            return render_template('register.html', captcha=new_captcha_dict)
+
+        # Handle POST request to process the form submission
         if request.method == "POST":
             username = request.form["username"]
             password = request.form["password"]
-            if UserModel.query.filter_by(username=username).first():
-                flash("Username already exists.")
+            c_hash = request.form.get('captcha-hash')
+            c_text = request.form.get('captcha-text')
+
+            # First, verify the CAPTCHA
+            if not SIMPLE_CAPTCHA.verify(c_text, c_hash):
+                flash("Invalid CAPTCHA.", "error")  
                 return redirect(url_for("register"))
 
+            # Check if the username already exists in the database
+            if UserModel.query.filter_by(username=username).first():
+                flash("Username already exists.", "error")
+                return redirect(url_for("register"))
+
+            # If passed all checks, add the new user to the database
             new_user = UserModel(username=username)
-            new_user.set_password(password)
+            new_user.set_password(password)  
             db.session.add(new_user)
             db.session.commit()
+            flash("Registration successful! Please login.", "success")
             return redirect(url_for("login"))
         return render_template("register.html")
 
