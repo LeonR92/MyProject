@@ -1,8 +1,1 @@
-document.getElementById('registration-form').addEventListener('submit', function(event) {
-    var password = document.getElementById('password').value;
-    var confirmPassword = document.getElementById('confirm-password').value;
-    if (password !== confirmPassword) {
-        alert("The passwords do not match!");
-        event.preventDefault(); // Prevent form submission
-    }
-});
+document.getElementById("registration-form").addEventListener("submit",(function(e){document.getElementById("password").value!==document.getElementById("confirm-password").value&&(alert("The passwords do not match!"),e.preventDefault())}));
