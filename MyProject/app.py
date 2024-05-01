@@ -147,7 +147,7 @@ def create_app(test_config=False):
     @app.route("/")
     @login_required
     def home():
-        return "Welcome, " + current_user.username
+        return render_template("homepage.html")
 
     def custom_static_handler(filename):
         # Use the built-in method to serve static files
@@ -167,4 +167,4 @@ if __name__ == "__main__":
     app = create_app()
     app.run(
         debug=True, host="192.168.2.31"
-    )  # Consider using `debug=True` only in a development environment
+    )  # Remove debug=True when deploying to production

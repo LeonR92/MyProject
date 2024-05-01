@@ -34,6 +34,5 @@ def get_countries():
 
     # Load the JSON data returned by the API
     countries = response.json()
-    print(countries)
 
     return render_template("country/country.html", countries=countries)
