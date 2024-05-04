@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dictionary</title>
+</head>
+<body>
+
+    <h1>
+        {{word}}
+        {% for meaning in meanings %}
+        <h2>{{ meaning.partOfSpeech }}</h2>
+        {% for definition in meaning.definitions %}
+            <p><strong>Definition:</strong> {{ definition.definition }}</p>
+            {% if definition.example %}
+                <p><strong>Example:</strong> {{ definition.example }}</p>
+            {% endif %}
+            <p><strong>Synonyms:</strong> {{ definition.synonyms | join(", ") }}</p>
+            <p><strong>Antonyms:</strong> {{ definition.antonyms | join(", ") }}</p>
+        {% endfor %}
+    {% endfor %}
+
+    </h1>
+    
+</body>
+</html>

@@ -13,6 +13,12 @@ def before_request():
     pass
 
 
-@dictionary.route("/")
-def index():
-    return "Hello"
+@dictionary.route("/<string:word>")
+def index(word):
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+    response = requests.get(url)
+    if response.ok:
+        data = response.json()
+        return render_template('dictionary/index.html', word=word, meanings=data[0]['meanings'])
+    else:
+        return render_template('error.html', message="Word not found")

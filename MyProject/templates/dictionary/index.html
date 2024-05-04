@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="max-w-5xl mx-auto">
+    <!-- SM Fullscreen -->
+    <!-- Navbar -->
+    <nav class="py-8 px-2 mb-2 flex flex-row justify-between items-center">
+        <!-- Logo -->
+        <h2 class="text-xl font-extrabold leading-none tracking-tight text-gray-900 md:text-2xl">My Dictionary</h2>
+        <!-- Back to Home page -->
+        <a href="/" class="cursor-pointer whitespace-nowrap bg-transparent rounded-xl border border-gray-700 px-4 py-2 text-sm font-medium tracking-wide text-gray-700 transition hover:opacity-75 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-700 active:opacity-100 active:outline-offset-0">Home Page</button>
+            </a>
+    </nav>
+    <!-- Search bar -->
+    <div class="py-2 mt-4 flex justify-center items-center w-full">
+        <div class="relative flex w-full  flex-col text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" class="absolute left-2.5 top-1/2 size-5 -translate-y-1/2 text-slate-700"> 
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input type="search" class="w-full rounded-xl border border-gray-300 bg-gray-100 py-4 pl-10 pr-2 text-sm " name="search" placeholder="Search" aria-label="search"/>
+        </div>
+    </div>
+
+    <!-- TODO !!! add API-->
+    <div class="flex flex-row justify-between items-center px-2 mt-16">
+        <h3 class="text-4xl font-bold leading-none tracking-tight text-gray-900">Keyboard</h3>
+        <p>Play</p>
+    </div>
+    <p class="px-2 mt-2 text-indigo-600 text-lg tracking-tight"> Phoenetics</p>
+    
+    <!-- Meaning list -->
+    <ul class="px-2 mt-16">
+        <li>
+            <div class="flex flex-row items-center">
+                <p class="font-extrabold">noun</p>
+                <div class="flex-grow ml-4 border-t border-gray-600"></div>
+            </div>
+            <p class="mt-16 font-bold text-slate-400 ">Meaning</p>
+            <ul class="list-disc pl-5 mt-4">
+                <li class="mt-1 ml-2 text-sm tracking-wide"><span>Meaning 1</span></li>
+            </ul>
+        </li>
+    </ul>
+    
+    <!-- Footer divider -->
+    <div class="mt-24 flex-grow border-t border-gray-300"></div>
+
+</body>
+<footer class="px-2">
+    <span>Link</span>
+</footer>
+</html>
