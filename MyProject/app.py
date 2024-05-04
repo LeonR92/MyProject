@@ -90,6 +90,14 @@ def create_app(test_config=False):
     # Register blueprints
     app.register_blueprint(country, url_prefix="/country")
 
+    # Import blueprints
+    from dictionary.app import (
+        dictionary,
+    )  # Ensure this import is correct based on your directory structure
+
+    # Register blueprints
+    app.register_blueprint(dictionary, url_prefix="/dictionary")
+
     # Configure Dashboard app
     dashboard1(app)
 
