@@ -125,13 +125,14 @@
                 ></button
               >
             </div>
+            {% if recent_searches %}
             <ul
               class="flex gap-3 overflow-x-scroll mt-4 scrollbar-hide snap-mandatory snap-x w-full rounded-2xl"
               role="listbox"
               aria-labelledby="carousel-content-label"
               tabindex="0"
               x-ref="slider">
-              {% for meaning in data.meanings %}
+              {% for word in recent_searches %}
 
               <li
                 class="items-center justify-center w-full flex flex-col shrink-0 snap-start h-full p-8 rounded-2xl lg:p-10 bg-gray-100"
@@ -140,16 +141,10 @@
                 <figure>
                   <div class="max-w-2xl">
                     <div class="flex flex-col gap-12">
-                    {% for definition in meaning.definitions %}
-                    {% if definition.definition %}
-
                       <p
                         class="text-base text-gray-900 font-display text-balance">
-                        "{{definition.definition}}"
+                        {{word }}
                       </p>
-                    {% endif %}
-                    {% endfor %}
-
                       <div class="block flex-shrink-0">
                         <div class="flex items-center">
                           <div>
@@ -173,9 +168,10 @@
                   </div>
                 </figure>
               </li>
+              {% endfor %}
 
             </ul>
-            {% endfor %}
+            {% endif %}
           </div>
         </div>
         <!-- Ends component -->

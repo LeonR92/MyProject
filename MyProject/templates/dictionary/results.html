@@ -27,10 +27,10 @@
     
 
     <!-- TODO !!! add API-->
-    <div class="flex flex-row justify-between items-center px-2 mt-16">
+    <div class="flex flex-row justify-between items-center px-2 mt-16 space-x-2 md:space-x-0">
         <h3 class="text-4xl font-bold leading-none tracking-tight text-gray-900">{{data.word}}</h3>
     {% if data.phonetics %}
-                <audio controls src="{{ data.phonetics[0].audio  }}"></audio>
+    <audio controls src="{{ data.phonetics[0].audio  }}"></audio>
     {% endif %}
     </div>
     {% if data.phonetics %}    

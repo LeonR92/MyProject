@@ -1,3 +1,6 @@
+from random_word import RandomWords
+
+
 def flatten_data(data):
     entry = data[0]  # Assuming there's always at least one entry
     flat_data = {
@@ -27,3 +30,8 @@ def flatten_data(data):
         })
 
     return flat_data
+
+
+def get_random_word():
+    r = RandomWords()
+    return r.get_random_word()
