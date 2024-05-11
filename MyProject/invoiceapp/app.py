@@ -2,11 +2,11 @@ from flask import Blueprint, jsonify, render_template
 import requests
 from utils import cache
 from flask_login import login_required
+from invoiceapp.models import Invoice,Favorite,InvoiceItem
 
 
 # Define the blueprint
 invoice = Blueprint("invoice", __name__, template_folder="templates")
-
 
 @invoice.before_request
 @login_required
@@ -16,4 +16,9 @@ def before_request():
 
 @invoice.route("/")
 def index():
-    return "Hello Invoice"
+    return render_template("invoice/index.html")
+
+
+@invoice.route('/newinvoice',methods=['POST'])
+def new_invoice():
+    pass
