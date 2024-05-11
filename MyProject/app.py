@@ -101,6 +101,10 @@ def create_app(test_config=False):
     # Configure Dashboard app
     dashboard1(app)
 
+    from invoiceapp.app import invoice
+    
+    app.register_blueprint(invoice,url_prefix="/invoice")
+
     @app.before_request
     def before_request_func():
         """
