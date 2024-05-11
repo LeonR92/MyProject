@@ -18,16 +18,8 @@ def before_request():
 
 @dictionary.route("/")
 def index():
-    word = session['recent_searches'][-1]
-    print(session['recent_searches'])
-    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
-    response = requests.get(url)
-    if response.ok:
-        data = response.json()
-        flat_data = flatten_data(data)
-        return render_template('dictionary/index.html', data=flat_data)
-    else:
-        return "Word not found"
+    return render_template('dictionary/index.html')
+ 
 
 
 

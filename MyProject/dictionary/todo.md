@@ -1,3 +1,3 @@
 phoenetic error handling
 general error handling
-favourite word
+Carousel or list for facourite word
