@@ -38,13 +38,13 @@
             <h3>To:{{invoice.receiver_address}}</h3>
             <h3>{{invoice.invoice_amount}}</h3>
             <div>{{invoice.invoice_status}}</div> <!-- TODO MAKE THIS DYNAMIC -->
-            <button onclick="toggleSidebar()" class="text-violet-400 font-bold text-lg">></button> <!-- TODO toggle navbar -->
+            <button onclick="toggleSidebar('{{ invoice.id }}')" class="text-violet-400 font-bold text-lg">></button> <!-- TODO toggle navbar -->
         </div>
         <!-- Side bar for CRUD, triggered by each accordion -->
         <!-- TODO EDIT BUTTON FOR IND. Element -->
         <div id="sidebar-{{ invoice.id }}" class="fixed inset-0 transform -translate-x-full transition-transform duration-300 ease-in-out w-full sm:w-72 bg-white p-4 z-50">
             <!-- Close button at the top right corner -->
-            <button onclick="toggleSidebar('{{ invoice.id }}')" class="absolute top-0 right-0 mt-2 mr-2 text-gray-400 hover:text-gray-600">
+            <button onclick="closeSidebar('sidebar-{{ invoice.id }}')" class="absolute top-0 right-0 mt-2 mr-2 text-gray-400 hover:text-gray-600">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -157,6 +157,20 @@
                 alert('You cannot remove all items.');
             }
         }
+        
+    </script>
+    <script>
+        function closeSidebar(sidebarId) {
+            var sidebar = document.getElementById(sidebarId);
+            if (sidebar) {
+                sidebar.style.display = 'none';
+            } else {
+                console.error('Sidebar element not found for ID:', sidebarId);
+            }
+        }
+        
+        
+        
         
     </script>
 
