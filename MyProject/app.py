@@ -47,9 +47,10 @@ def create_app(test_config=False):
     app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=7)
     app.config["REMEMBER_COOKIE_SECURE"] = True
     app.config["REMEMBER_COOKIE_HTTPONLY"] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///default.db' 
     app.config['SQLALCHEMY_BINDS'] = {
         'users':    'sqlite:///users_login.db',
-        'invoices': 'sqlite:///instance/invoice.db'
+        'invoice': 'sqlite:///invoice.db'
     }   
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
