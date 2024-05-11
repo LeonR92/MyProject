@@ -1,28 +1,37 @@
-from flask_sqlalchemy import SQLAlchemy
-from users import UserModel
+from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Text, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
 from datetime import datetime
 
-db = SQLAlchemy()
+# Define the base class
+Base = declarative_base()
 
-class Invoice(db.Model):
+class Invoice(Base):
     __tablename__ = 'invoice'
-    __bind_key__ = 'invoice'
-    id = db.Column(db.Integer, primary_key=True)
-    invoice_num = db.Column(db.String(120), unique=True, nullable=False)
-    invoice_amount = db.Column(db.Float, nullable=False)
-    sender_address = db.Column(db.String(255), nullable=False)  # Added sender's address
-    receiver_address = db.Column(db.String(255), nullable=False)  # Added receiver's address
-    invoice_date = db.Column(db.DateTime, default=datetime.utcnow)  # Added invoice date
-    payment_terms = db.Column(db.Integer, nullable=False)  # Added payment terms in days
-    invoice_description = db.Column(db.Text, nullable=True)  # Added invoice description
-    receiver = db.Column(db.String(120), nullable=False)
-    created_by = db.Column(db.Integer, nullable=False)
-    invoice_status = db.Column(db.String(50), nullable=False)
-    items = db.relationship('InvoiceItem', backref='invoice', lazy='dynamic')  # Added item list relationship
+    id = Column(Integer, primary_key=True)
+    invoice_num = Column(String(120), unique=True, nullable=False)
+    invoice_amount = Column(Float, nullable=False)
+    sender_address = Column(String(255), nullable=False)
+    receiver_address = Column(String(255), nullable=False)
+    invoice_date = Column(DateTime, default=datetime.utcnow)
+    payment_terms = Column(Integer, nullable=True)
+    invoice_description = Column(Text, nullable=True)
+    receiver = Column(String(120), nullable=True)
+    invoice_status = Column(String(50), nullable=True)
+    items = relationship('InvoiceItem', backref='invoice')
 
-class InvoiceItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'), nullable=False)
-    description = db.Column(db.String(255), nullable=False)  # Description of the item
-    quantity = db.Column(db.Integer, nullable=False)  # Quantity of the item
-    price = db.Column(db.Float, nullable=False)  # Price per item
+class InvoiceItem(Base):
+    __tablename__ = 'invoice_item'
+    id = Column(Integer, primary_key=True)
+    invoice_id = Column(Integer, ForeignKey('invoice.id'), nullable=False)
+    description = Column(String(255), nullable=False)
+    quantity = Column(Integer, nullable=False)
+    price = Column(Float, nullable=False)
+
+# Engine and session setup
+engine = create_engine('sqlite:///invoice.db', echo=True)  # Change the connection string as needed
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Create tables in the database
+Base.metadata.create_all(engine)

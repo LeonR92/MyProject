@@ -1,11 +1,13 @@
-from flask import Blueprint, jsonify, render_template,request, url_for, redirect
+from flask import Blueprint, jsonify, render_template,request, url_for, redirect,flash
 import requests
 from utils import cache
 from flask_login import login_required
-from invoiceapp.models import Invoice,InvoiceItem
+from invoiceapp.models import Invoice,InvoiceItem,Base
 from app import db
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
 
 
@@ -13,9 +15,10 @@ from sqlalchemy.exc import SQLAlchemyError
 # Define the blueprint
 invoice = Blueprint("invoice", __name__, template_folder="templates")
 
-@invoice.before_request
-def create_tables():
-    db.create_all()
+engine = create_engine('sqlite:///invoice.db')  # Update the connection string as needed
+Session = sessionmaker(bind=engine)
+
+
 
 @invoice.before_request
 @login_required
@@ -25,36 +28,43 @@ def before_request():
 
 @invoice.route("/")
 def index():
-    invoices = Invoice.query.all()
-    return render_template("invoice/index.html",invoices = invoices)
+    session = Session()
+    try:
+        invoices = session.query(Invoice).all()
+        return render_template("invoice/index.html", invoices=invoices)
+    finally:
+        # Ensure that the session is closed after the request
+        session.close()
 
 
 # TODO add data validation
 # Auto Calculation
 @invoice.route('/newinvoice', methods=['POST'])
 def new_invoice():
+    session = Session()
     try:
-        # Extracting data from form fields
-        new_invoice = Invoice(
-            invoice_num=request.form['invoice_num'],
-            invoice_amount=request.form['invoice_amount'],
-            sender_address=request.form['sender_address'],
-            receiver_address=request.form['receiver_address'],
-            invoice_date=request.form.get('invoice_date', datetime.utcnow()),  # default to now if not provided
-            payment_terms=int(request.form['payment_terms']),
-            invoice_description=request.form.get('invoice_description', ''),  # default to empty if not provided
-            receiver=request.form['receiver'],
-            created_by=request.form['created_by'],  # Adjust based on session or auth context
-            invoice_status=request.form['invoice_status']
-        )
-        db.session.add(new_invoice)
-        db.session.flush()  # Flush to assign an ID to new_invoice
-
-        # Handling dynamically added invoice items
+        # Extract data from form fields and calculate total amount
         item_descriptions = request.form.getlist('description[]')
         item_quantities = request.form.getlist('quantity[]')
         item_prices = request.form.getlist('price[]')
+        total_amount = sum(int(qty) * float(price) for qty, price in zip(item_quantities, item_prices))
 
+        # Create new invoice object
+        new_invoice = Invoice(
+            invoice_num=request.form['invoice_num'],
+            invoice_amount=total_amount,
+            sender_address=request.form['sender_address'],
+            receiver_address=request.form['receiver_address'],
+            invoice_date=request.form.get('invoice_date', datetime.utcnow()),
+           #  payment_terms=int(request.form['payment_terms']),
+           # invoice_description=request.form.get('invoice_description', ''),
+           # receiver=request.form['receiver'],
+           # created_by=request.form['created_by'],
+            invoice_status=request.form['invoice_status']
+        )
+        session.add(new_invoice)
+        session.commit() 
+        # Add invoice items
         for desc, qty, price in zip(item_descriptions, item_quantities, item_prices):
             item = InvoiceItem(
                 invoice_id=new_invoice.id,
@@ -62,11 +72,14 @@ def new_invoice():
                 quantity=int(qty),
                 price=float(price)
             )
-            db.session.add(item)
+            session.add(item)
 
-        db.session.commit()
-        return redirect(url_for('some_function_name'))  # Redirect or return a success message
-
+        session.commit()
+        flash('Invoice created successfully!')
+        return redirect(url_for('invoice.index'))  # Redirect to index or a confirmation page
     except Exception as e:
-        db.session.rollback()
-        return jsonify({'message': str(e)}), 400
+        session.rollback()
+        flash(f"An error occurred: {e}")
+        return f"{e}"
+    finally:
+        session.close()

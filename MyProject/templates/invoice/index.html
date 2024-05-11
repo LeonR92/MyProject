@@ -30,31 +30,44 @@
 
     <!-- Table -->
     <!-- TODO JINJA TEMPLATE -->
+    {% for invoice in invoices %}
     <div class="container max-w-3xl mx-auto px-4 py-8 rounded-xl bg-slate-800 text-sm text-white">
         <div class="flex flex-row items-center justify-between">
-            <h2>#<span class="font-bold">RT3080</span></h2>
+            <h2>#<span class="font-bold">{{invoice.invoice_num}}</span></h2>
             <h3>Due at </h3>
-            <h3>Jen Huang</h3>
-            <h3>$ 1,800.90</h3>
-            <div>Paid</div> <!-- TODO MAKE THIS DYNAMIC -->
+            <h3>To:{{invoice.receiver_address}}</h3>
+            <h3>{{invoice.invoice_amount}}</h3>
+            <div>{{invoice.invoice_status}}</div> <!-- TODO MAKE THIS DYNAMIC -->
             <button onclick="toggleSidebar()" class="text-violet-400 font-bold text-lg">></button> <!-- TODO toggle navbar -->
         </div>
+        <!-- Side bar for CRUD, triggered by each accordion -->
+        <!-- TODO EDIT BUTTON FOR IND. Element -->
+        <div id="sidebar-{{ invoice.id }}" class="fixed inset-0 transform -translate-x-full transition-transform duration-300 ease-in-out w-full sm:w-72 bg-white p-4 z-50">
+            <!-- Close button at the top right corner -->
+            <button onclick="toggleSidebar('{{ invoice.id }}')" class="absolute top-0 right-0 mt-2 mr-2 text-gray-400 hover:text-gray-600">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <form action="#" class="mt-8">
+                <input type="text" placeholder="Invoice Number" class="block w-full mb-3 px-3 py-2 border rounded font-black" value="{{invoice.invoice_num}}">
+                <input type="text" placeholder="Receiver Address" class="block w-full mb-3 px-3 py-2 border rounded font-black" value="{{invoice.receiver_address}}">
+                <input type="text" placeholder="Receiver Address" class="block w-full mb-3 px-3 py-2 border rounded font-black" value="{{invoice.invoice_amount}}">
+                <div id="itemsContainer">
+                    {% for item in invoice.items %}
+                    <div class="item mb-3">
+                        <input type="text" name="description[]" placeholder="Item Description" class="block w-full mb-1 px-3 py-2 border rounded font-black" value="{{ item.description }}">
+                        <input type="number" name="quantity[]" placeholder="Quantity" class="block w-full mb-1 px-3 py-2 border rounded font-black" value="{{ item.quantity }}">
+                        <input type="number" name="price[]" placeholder="Price per Item" class="block w-full mb-1 px-3 py-2 border rounded font-black" value="{{ item.price }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+            </form>
+        </div>
     </div>
-    <!-- Side bar for CRUD, triggered by each accordion -->
-    <!-- TODO EDIT BUTTON FOR IND. Element -->
-    <div id="sidebar" class="fixed inset-0 transform -translate-x-full transition-transform duration-300 ease-in-out w-full sm:w-72 bg-white p-4 z-50">
-        <!-- Close button at the top right corner -->
-        <button onclick="toggleSidebar(false)" class="absolute top-0 right-0 mt-2 mr-2 text-gray-400 hover:text-gray-600">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-        <form action="#">
-            <input type="text" placeholder="Your Name" class="block w-full mb-3 px-3 py-2 border rounded">
-            <input type="email" placeholder="Email Address" class="block w-full mb-3 px-3 py-2 border rounded">
-            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
-        </form>
-    </div>
+    {% endfor %}
+
 
     <!-- MODAL for new entry -->
         <!-- Modal -->
@@ -70,11 +83,18 @@
                     </button>
     
                     <!-- Form content -->
-                    <form id="invoiceForm" class="mt-2" action="/newinvoice" method="post">
-                        <input type="text" placeholder="Invoice Number" class="mt-2 p-2 w-full border rounded">
-                        <input type="text" placeholder="Invoice Amount" class="mt-2 p-2 w-full border rounded">
-                        <input type="text" placeholder="Sender Address" class="mt-2 p-2 w-full border rounded">
-                        <input type="text" placeholder="Receiver Address" class="mt-2 p-2 w-full border rounded">
+                    <form id="invoiceForm" class="mt-2" action="/invoice/newinvoice" method="post">
+                        <input type="text" name="invoice_num" placeholder="Invoice Number" class="mt-2 p-2 w-full border rounded">
+                        <input type="text" name="sender_address" placeholder="Sender Address" class="mt-2 p-2 w-full border rounded">
+                        <input type="text" name="receiver_address" placeholder="Receiver Address" class="mt-2 p-2 w-full border rounded">
+                        <div class="mt-2">
+                            <label for="invoice_status">Invoice Status:</label>
+                            <select name="invoice_status" id="invoice_status" class="p-2 w-full border rounded">
+                                <option value="Open">Open</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Draft">Draft</option>
+                            </select>
+                        </div>
                         <!-- Dynamic item fields would go here -->
                         <div id="itemContainer">
                             <div class="mt-4 flex flex-col">
@@ -97,21 +117,21 @@
             </div>
         </div>
         
-        <ul>
-            {% for invoice in invoices %}
-                <li>
-                    Invoice Number: {{ invoice.invoice_num }}, Amount: {{ invoice.invoice_amount }}, 
-                    Sender: {{ invoice.sender_address }}, Receiver: {{ invoice.receiver_address }}
-                </li>
-            {% endfor %}
-        </ul>
+
 
     <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            // Toggle the transform property to slide in or out
-            sidebar.classList.toggle('-translate-x-full');
+        function toggleSidebar(invoiceId) {
+            var sidebar = document.getElementById('sidebar-' + invoiceId);
+            if (sidebar) {
+                // Check if sidebar is currently shown by checking its transform property
+                var isShown = sidebar.style.transform === 'translateX(0px)';
+                // Toggle the transform property
+                sidebar.style.transform = isShown ? 'translateX(-100%)' : 'translateX(0px)';
+            } else {
+                console.error('Sidebar element not found for invoice ID:', invoiceId);
+            }
         }
+        
     </script>
 
 
