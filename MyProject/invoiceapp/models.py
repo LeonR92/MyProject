@@ -6,6 +6,7 @@ db = SQLAlchemy()
 
 class Invoice(db.Model):
     __tablename__ = 'invoice'
+    __bind_key__ = 'invoice'
     id = db.Column(db.Integer, primary_key=True)
     invoice_num = db.Column(db.String(120), unique=True, nullable=False)
     invoice_amount = db.Column(db.Float, nullable=False)

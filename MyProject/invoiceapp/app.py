@@ -5,6 +5,8 @@ from flask_login import login_required
 from invoiceapp.models import Invoice,Favorite,InvoiceItem
 from app import db
 from datetime import datetime
+from sqlalchemy.exc import SQLAlchemyError
+
 
 
 
@@ -23,8 +25,7 @@ def before_request():
 
 @invoice.route("/")
 def index():
-    invoices = Invoice.query.all()
-    return render_template("invoice/index.html",invoices=invoices)
+    return render_template("invoice/index.html")
 
 
 # TODO add data validation
