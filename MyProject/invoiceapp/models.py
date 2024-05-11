@@ -16,9 +16,8 @@ class Invoice(db.Model):
     payment_terms = db.Column(db.Integer, nullable=False)  # Added payment terms in days
     invoice_description = db.Column(db.Text, nullable=True)  # Added invoice description
     receiver = db.Column(db.String(120), nullable=False)
-    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_by = db.Column(db.Integer, nullable=False)
     invoice_status = db.Column(db.String(50), nullable=False)
-    favorites = db.relationship('Favorite', backref='invoice', lazy='dynamic')
     items = db.relationship('InvoiceItem', backref='invoice', lazy='dynamic')  # Added item list relationship
 
 class InvoiceItem(db.Model):
@@ -27,8 +26,3 @@ class InvoiceItem(db.Model):
     description = db.Column(db.String(255), nullable=False)  # Description of the item
     quantity = db.Column(db.Integer, nullable=False)  # Quantity of the item
     price = db.Column(db.Float, nullable=False)  # Price per item
-
-class Favorite(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'), nullable=False)

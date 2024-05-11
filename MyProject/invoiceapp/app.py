@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, render_template,request, url_for, redirect
 import requests
 from utils import cache
 from flask_login import login_required
-from invoiceapp.models import Invoice,Favorite,InvoiceItem
+from invoiceapp.models import Invoice,InvoiceItem
 from app import db
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
@@ -25,7 +25,8 @@ def before_request():
 
 @invoice.route("/")
 def index():
-    return render_template("invoice/index.html")
+    invoices = Invoice.query.all()
+    return render_template("invoice/index.html",invoices = invoices)
 
 
 # TODO add data validation
