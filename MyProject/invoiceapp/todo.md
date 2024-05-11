@@ -1,4 +1,4 @@
-1. fix db
-2. fix route /addinvoice
-3. query table for index
-4. Auto calculation
+1. add /update route
+2. Data validation server and client side
+3. client side filtering status
+4. buggy double click in form.
