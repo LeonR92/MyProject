@@ -6,7 +6,7 @@
     <title>Invoice Overview</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black mx-4">
+<body class="bg-gray-900 mx-4">
     <!-- Container for header -->
     <div class="container max-w-3xl my-12 p-2 mx-auto text-white">
         <div class="flex items-center justify-between">
@@ -35,37 +35,50 @@
         <div class="flex flex-row items-center justify-between">
             <h2>#<span class="font-bold">{{invoice.invoice_num}}</span></h2>
             <h3>Due at </h3>
-            <h3>To:{{invoice.receiver_address}}</h3>
-            <h3>{{invoice.invoice_amount}}</h3>
+            <h3>To: {{invoice.receiver_address}}</h3>
+            <h3>$ {{invoice.invoice_amount}}</h3>
             <div>{{invoice.invoice_status}}</div> <!-- TODO MAKE THIS DYNAMIC -->
             <button onclick="toggleSidebar('{{ invoice.id }}')" class="text-violet-400 font-bold text-lg">></button> <!-- TODO toggle navbar -->
         </div>
         <!-- Side bar for CRUD, triggered by each accordion -->
         <!-- TODO EDIT BUTTON FOR IND. Element -->
-        <div id="sidebar-{{ invoice.id }}" class="fixed inset-0 transform -translate-x-full transition-transform duration-300 ease-in-out w-full sm:w-72 bg-white p-4 z-50">
+        <div id="sidebar-{{ invoice.id }}" class="fixed inset-0 transform -translate-x-full transition-transform duration-300 ease-in-out w-full sm:w-72 bg-gray-700 p-4 z-50">
             <!-- Close button at the top right corner -->
-            <button onclick="closeSidebar('sidebar-{{ invoice.id }}')" class="absolute top-0 right-0 mt-2 mr-2 text-gray-400 hover:text-gray-600">
+            <button onclick="closeSidebar('sidebar-{{ invoice.id }}')" class="absolute top-0 left-1 mt-2 mr-2 text-gray-400 hover:text-gray-600">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <form action="#" class="mt-8">
-                <input type="text" placeholder="Invoice Number" class="block w-full mb-3 px-3 py-2 border rounded font-black" value="{{invoice.invoice_num}}">
-                <input type="text" placeholder="Receiver Address" class="block w-full mb-3 px-3 py-2 border rounded font-black" value="{{invoice.receiver_address}}">
-                <input type="text" placeholder="Receiver Address" class="block w-full mb-3 px-3 py-2 border rounded font-black" value="{{invoice.invoice_amount}}">
-                <div id="itemsContainer">
+            <!-- The form for /update -->
+            <div class="max-h-screen overflow-y-auto">
+            <form action="/invoice/update" method="POST"  class="my-8 text-white  ">
+                <label for="Invoice Number"> Invoice Number(Read Only)</label>
+                <input type="text" id="invoice_num" name="invoice_num" placeholder="Read Only Invoice number" class="block w-full mb-3 px-3 py-2 border rounded text-black" value="{{invoice.invoice_num}}" readonly>
+                <label for="Invoice Receiver Address"> Receiver Address</label>
+                <input type="text" id="receiver_address" maxlength="3" name="receiver_address" placeholder="Receiver Address" class="block w-full mb-3 px-3 py-2 border rounded text-black" value="{{invoice.receiver_address}}" required>
+                <label for="Invoice Receiver Address"> Sender Address</label>
+                <input type="text" id="sender_address" name="sender_address" maxlength="3" placeholder="Sender Address" class="block w-full mb-3 px-3 py-2 border rounded text-black" value="{{invoice.receiver_address}}" required>
+                <label for="Invoice Status"> Invoice Status</label>
+                <select name="invoice_status" id="invoice_status" class="block w-full mb-3 px-3 py-2 border rounded text-black">
+                    <option value="Paid">Paid</option>
+                    <option value="Open">Open</option>
+                    <option value="Draft">Draft</option>
+                </select>
+                <div>
                     {% for item in invoice.items %}
-                    <div class="item mb-3">
-                        <input type="text" name="description[]" placeholder="Item Description" class="block w-full mb-1 px-3 py-2 border rounded font-black" value="{{ item.description }}">
-                        <input type="number" name="quantity[]" placeholder="Quantity" class="block w-full mb-1 px-3 py-2 border rounded font-black" value="{{ item.quantity }}">
-                        <input type="number" name="price[]" placeholder="Price per Item" class="block w-full mb-1 px-3 py-2 border rounded font-black" value="{{ item.price }}">
+                    <div class="item my-4">
+                        <label for="Item Description"> Item Details </label>
+                        <input type="text" maxlength="20" name="description[]" placeholder="Item Description" class="block w-full mb-2 px-3 py-2 border rounded text-black" value="{{ item.description }}">
+                        <input type="number" maxlength="5" name="quantity[]" placeholder="Quantity" class="block w-full mb-2 px-3 py-2 border rounded text-black" value="{{ item.quantity }}">
+                        <input type="number" maxlength="5" name="price[]" placeholder="Price per Item" class="block w-full mb-2 px-3 py-2 border rounded text-black" value="{{ item.price }}">
                     </div>
                     {% endfor %}
                 </div>
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+                <button type="submit" class="w-full bg-violet-700 hover:opacity-70 my-4 text-white font-bold py-2 px-4 rounded">Submit</button>
             </form>
         </div>
     </div>
+</div>
     {% endfor %}
 
 
@@ -95,7 +108,7 @@
                                 <option value="Draft">Draft</option>
                             </select>
                         </div>
-                        <!-- Dynamic item fields would go here -->
+                        <!-- Dynamic item fields  -->
                         <div id="itemContainer">
                             <div class="mt-4 flex flex-col">
                                 <label class="font-bold">Item</label>
@@ -117,8 +130,9 @@
             </div>
         </div>
         
-
-
+     
+        
+    <!-- TODO !!! minify and move to a separate .js file -->    
     <script>
         function toggleSidebar(invoiceId) {
             var sidebar = document.getElementById('sidebar-' + invoiceId);
@@ -132,6 +146,17 @@
             }
         }
         
+    </script>
+
+    <script>
+        function closeSidebar(sidebarId) {
+            var sidebar = document.getElementById(sidebarId);
+            if (sidebar) {
+                sidebar.style.display = 'none';
+            } else {
+                console.error('Sidebar element not found for ID:', sidebarId);
+            }
+        }
     </script>
 
 
@@ -157,20 +182,6 @@
                 alert('You cannot remove all items.');
             }
         }
-        
-    </script>
-    <script>
-        function closeSidebar(sidebarId) {
-            var sidebar = document.getElementById(sidebarId);
-            if (sidebar) {
-                sidebar.style.display = 'none';
-            } else {
-                console.error('Sidebar element not found for ID:', sidebarId);
-            }
-        }
-        
-        
-        
         
     </script>
 
