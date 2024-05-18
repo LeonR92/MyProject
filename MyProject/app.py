@@ -47,9 +47,9 @@ def create_app(test_config=False):
     app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=7)
     app.config["REMEMBER_COOKIE_SECURE"] = True
     app.config["REMEMBER_COOKIE_HTTPONLY"] = True
-    app.config['SQLALCHEMY_BINDS'] = {
-        'users':    'sqlite:///users_login.db',
-    }   
+    app.config["SQLALCHEMY_BINDS"] = {
+        "users": "sqlite:///users_login.db",
+    }
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
     # app.config['SESSION_COOKIE_SECURE'] = True
@@ -104,14 +104,14 @@ def create_app(test_config=False):
     dashboard1(app)
 
     from invoiceapp.app import invoice
-    
-    app.register_blueprint(invoice,url_prefix="/invoice")
+
+    app.register_blueprint(invoice, url_prefix="/invoice")
 
     @app.before_request
     def before_request_func():
         """
         Before request to limit request and check for login status
-        """ 
+        """
         if "/dashboard1/" in request.path:
             # Check if the user is not authenticated and added rate limiter to prevent burst
             limiter.limit("15 per minute")(lambda: request.path)()
