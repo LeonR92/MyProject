@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    container_name: flask_app
+    command: ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:create_app()"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - FLASK_ENV=production
+      - REDIS_URL=redis://redis:6379/0
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
